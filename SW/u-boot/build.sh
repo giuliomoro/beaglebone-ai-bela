@@ -45,6 +45,10 @@ dl_gcc_generic () {
 	non_https_site="http://releases.linaro.org"
 	non_https_archive_site="http://releases.linaro.org/archive"
 	WGET="wget -c --directory-prefix=${gcc_dir}/"
+	if [ "x${ARCH}" = "xarmv7l" ] ; then
+		#using native gcc
+		CC=
+	else
 	if [ ! -f "${gcc_dir}/${directory}/${datestamp}" ] ; then
 		echo "Installing: ${toolchain_name}"
 		echo "-----------------------------"
@@ -57,11 +61,6 @@ dl_gcc_generic () {
 			touch "${gcc_dir}/${directory}/${datestamp}"
 		fi
 	fi
-
-	if [ "x${ARCH}" = "xarmv7l" ] ; then
-		#using native gcc
-		CC=
-	else
 		if [ -f /usr/bin/ccache ] ; then
 			CC="ccache ${gcc_dir}/${directory}/${binary}"
 		else
@@ -100,6 +99,7 @@ git_generic () {
 	echo "Starting ${project} build for: ${board}"
 	echo "-----------------------------"
 
+if [ z${REBUILD} != ztrue ] ; then
 	if [ ! -f ${DIR}/git/${project}/.git/config ] ; then
 		git clone git://github.com/RobertCNelson/${project}.git ${DIR}/git/${project}/
 	fi
@@ -116,12 +116,15 @@ git_generic () {
 	mkdir -p ${DIR}/scratch/${project}
 	git clone --shared ${DIR}/git/${project} ${DIR}/scratch/${project}
 
+fi
 	cd ${DIR}/scratch/${project}
 
+if [ z${REBUILD} != ztrue ] ; then
 	if [ "${GIT_SHA}" ] ; then
 		echo "Checking out: ${GIT_SHA}"
 		git checkout ${GIT_SHA} -b ${project}-scratch
 	fi
+fi
 }
 
 git_cleanup () {
@@ -154,16 +157,19 @@ build_u_boot () {
 	git_generic
 	RELEASE_VER="-r0"
 
+	echo "-----------------------------"
+if [ z${REBUILD} != ztrue ] ; then
+	echo "make ARCH=arm CROSS_COMPILE=\"${CC}\" distclean"
 	make ARCH=arm CROSS_COMPILE="${CC}" distclean
+fi
 	UGIT_VERSION=$(git describe)
 
-	echo "-----------------------------"
-	echo "make ARCH=arm CROSS_COMPILE=\"${CC}\" distclean"
 	echo "make ARCH=arm CROSS_COMPILE=\"${CC}\" ${uboot_config}"
 	echo "make ARCH=arm CROSS_COMPILE=\"${CC}\" ${BUILDTARGET}"
 	echo "-----------------------------"
 
 	#v2019.04-rc4
+	if [ z${REBUILD} != ztrue ] ; then
 	p_dir="${DIR}/patches/${uboot_stable}"
 	if [ "${stable}" ] ; then
 		#r1: initial release
@@ -192,6 +198,8 @@ build_u_boot () {
 			cp "${p_dir}/hw_data.c" arch/arm/mach-omap2/omap5/hw_data.c
 			# meld patches/v2019.04-rc4/boot.h scratch/u-boot/include/environment/ti/boot.h
 			cp "${p_dir}/boot.h" include/environment/ti/boot.h
+			echo "patch -p1 < \"${p_dir}/0001-GIULIO-debug.patch\""
+			patch -p1 < "${p_dir}/0001-GIULIO-debug.patch"
 
 			git add arch/arm/dts/am5729-beagleboneai.dts
 			git commit -a -m 'BeagleBone AI support'
@@ -221,6 +229,7 @@ build_u_boot () {
 			patch -p1 < ${p_dir}/wip.diff
 		fi
 	fi
+	fi
 
 	if [ -f "${DIR}/stop.after.patch" ] ; then
 		echo "-----------------------------"
@@ -236,14 +245,20 @@ build_u_boot () {
 
 	mkdir -p ${DIR}/deploy/${board}
 
-	make ARCH=arm CROSS_COMPILE="${CC}" ${uboot_config} > /dev/null
+
+if [ z${REBUILD} != ztrue ] ; then
+	make ARCH=arm CROSS_COMPILE="${CC}" ${uboot_config} Q= > /dev/null
 	echo "Building ${project}: ${uboot_filename}:"
+fi
 	#make ARCH=arm CROSS_COMPILE="${CC}" menuconfig
-	make ARCH=arm CROSS_COMPILE="${CC}" -j${CORES} ${BUILDTARGET} > /dev/null
+	pwd
+	make Q= ARCH=arm CROSS_COMPILE="${CC}" -j${CORES} ${BUILDTARGET}
+	returned: echo $?
 
 	unset UBOOT_DONE
 	echo "-----------------------------"
 	#SPL based targets, need MLO and u-boot.img from u-boot
+	set -x
 	if [ ! "${UBOOT_DONE}" ] && [ -f ${DIR}/scratch/${project}/MLO ] ; then
 		filename_search="MLO"
 		filename_id="deploy/${board}/MLO-${uboot_filename}"
@@ -312,7 +327,9 @@ am57xx_evm_em () {
 }
 #exit
 
-am57xx_evm_em
+uboot_stable="v2019.04-rc4"
+#am57xx_evm_em
+[ -z "$REBUILD" ] && REBUILD=true
 am57xx_evm_mainline
 
 #

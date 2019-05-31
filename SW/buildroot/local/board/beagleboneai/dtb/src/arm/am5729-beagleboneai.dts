@@ -15,6 +15,7 @@
 
 #define MAX_SOURCES 400
 #define KERNEL_4_9
+#define BELA
 
 / {
 	model = "BeagleBoard.org BeagleBone AI";
@@ -274,6 +275,7 @@
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
 		pinctrl-0 = <&cape_pins_default>;
+		status = "okay";
 	};
 
 	extcon_usb1: extcon_usb1 {
@@ -5375,21 +5377,33 @@
 			DRA7XX_CORE_IOPAD(0x37C0, MUX_MODE15) /* A26: P9.22b: spi2_sclk.off */
 			DRA7XX_CORE_IOPAD(0x37B4, MUX_MODE15) /* A22: P9.23: spi1_cs1.off */
 			DRA7XX_CORE_IOPAD(0x368C, MUX_MODE15) /* F20: P9.24: gpio6_15.off */
-			DRA7XX_CORE_IOPAD(0x3694, MUX_MODE15) /* D18: P9.25: xref_clk0.off */
+			//DRA7XX_CORE_IOPAD(0x3694, MUX_MODE15) /* D18: P9.25: xref_clk0.off */
 			DRA7XX_CORE_IOPAD(0x3688, MUX_MODE15) /* E21: P9.26a: gpio6_14.off */
 			DRA7XX_CORE_IOPAD(0x3544, MUX_MODE15) /* AE2: P9.26b: vin1a_d20.off */
 			DRA7XX_CORE_IOPAD(0x35A0, MUX_MODE15) /* C3: P9.27a: vin2a_d14.off */
 			DRA7XX_CORE_IOPAD(0x36B0, MUX_MODE15) /* J14: P9.27b: mcasp1_fsr.off */
-			DRA7XX_CORE_IOPAD(0x36E0, MUX_MODE15) /* A12: P9.28: mcasp1_axr11.off */
-			DRA7XX_CORE_IOPAD(0x36D8, MUX_MODE15) /* A11: P9.29a: mcasp1_axr9.off */
-			DRA7XX_CORE_IOPAD(0x36A8, MUX_MODE15) /* D14: P9.29b: mcasp1_fsx.off */
-			DRA7XX_CORE_IOPAD(0x36DC, MUX_MODE15) /* B13: P9.30: mcasp1_axr10.off */
-			DRA7XX_CORE_IOPAD(0x36D4, MUX_MODE15) /* B12: P9.31a: mcasp1_axr8.off */
-			DRA7XX_CORE_IOPAD(0x36A4, MUX_MODE15) /* C14: P9.31b: mcasp1_aclkx.off */
+			//DRA7XX_CORE_IOPAD(0x36E0, MUX_MODE15) /* A12: P9.28: mcasp1_axr11.off */
+			//DRA7XX_CORE_IOPAD(0x36D8, MUX_MODE15) /* A11: P9.29a: mcasp1_axr9.off */
+			//DRA7XX_CORE_IOPAD(0x36A8, MUX_MODE15) /* D14: P9.29b: mcasp1_fsx.off */
+			//DRA7XX_CORE_IOPAD(0x36DC, MUX_MODE15) /* B13: P9.30: mcasp1_axr10.off */
+			//DRA7XX_CORE_IOPAD(0x36D4, MUX_MODE15) /* B12: P9.31a: mcasp1_axr8.off */
+			//DRA7XX_CORE_IOPAD(0x36A4, MUX_MODE15) /* C14: P9.31b: mcasp1_aclkx.off */
 			DRA7XX_CORE_IOPAD(0x36A0, MUX_MODE15) /* C23: P9.41a: xref_clk3.off */
 			DRA7XX_CORE_IOPAD(0x3580, MUX_MODE15) /* C1: P9.41b: vin2a_d6.off */
 			DRA7XX_CORE_IOPAD(0x36E4, MUX_MODE15) /* E14: P9.42a: mcasp1_axr12.off */
 			DRA7XX_CORE_IOPAD(0x359C, MUX_MODE15) /* C2: P9.42b: vin2a_d13.off */
+
+#ifdef BELA
+// bela pins
+/* BELA0 */ DRA7XX_CORE_IOPAD(0x3694, PIN_OUTPUT_PULLDOWN | MUX_MODE3) /* D18: P9.25: xref_clk0.off */  //mcasp0_ahclkx mcasp1_ahclkx MODE3
+/* BELA1 */ DRA7XX_CORE_IOPAD(0x36E0, PIN_INPUT_PULLDOWN | MUX_MODE0) /* A12: P9.28: mcasp1_axr11.off */ //mcasp0_axr2 mcasp1_axr11 MODE0
+/* BELA2 */ DRA7XX_CORE_IOPAD(0x36D8, PIN_INPUT | MUX_MODE15) /* A11: P9.29a: mcasp1_axr9.off */ //mcasp0_fsx off MODE15
+
+/* BELA3 */ DRA7XX_CORE_IOPAD(0x36A8, PIN_INPUT_PULLDOWN | MUX_MODE0) /* D14: P9.29b: mcasp1_fsx.off */ //mcasp0_fsx mcasp1_fsx MODE0
+/* BELA4 */ DRA7XX_CORE_IOPAD(0x36DC, PIN_INPUT_PULLDOWN | MUX_MODE0) /* B13: P9.30: mcasp1_axr10.off */ //mcasp0_axr0 mcasp1_axr10 MODE0
+/* BELA5 */ DRA7XX_CORE_IOPAD(0x36D4, PIN_INPUT | MUX_MODE15) /* B12: P9.31a: mcasp1_axr8.off */ // mcasp0_aclkx off MODE15
+/* BELA6 */ DRA7XX_CORE_IOPAD(0x36A4, PIN_INPUT_PULLDOWN | MUX_MODE0) /* C14: P9.31b: mcasp1_aclkx.off */ // mcasp0_aclkx mcasp1_aclkx MODE0
+#endif /* BELA */
 		>;
 	};
 };
@@ -5827,7 +5841,11 @@
 };
 
 &hdmi {
+#ifdef BELA
+	status = "disabled";
+#else
 	status = "okay";
+#endif /* BELA */
 	vdda-supply = <&vdd_1v8_phy_ldo4>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&hdmi_pins_default>;
@@ -7310,3 +7328,116 @@
 	};
 };
 
+#ifdef BELA
+// lines below taken from am335x-boneblack-common.dtsi and adapted
+&dra7_pmx_core {
+	mcasp1_pins: mcasp1_pins {
+		pinctrl-single,pins = <
+/* BELA0 */ DRA7XX_CORE_IOPAD(0x3694, PIN_OUTPUT_PULLDOWN | MUX_MODE3) /* D18: P9.25: xref_clk0.off */  //mcasp0_ahclkx mcasp1_ahclkx MODE3
+/* BELA1 */ DRA7XX_CORE_IOPAD(0x36E0, PIN_INPUT_PULLDOWN | MUX_MODE0) /* A12: P9.28: mcasp1_axr11.off */ //mcasp0_axr2 mcasp1_axr11 MODE0
+/* BELA2 */ DRA7XX_CORE_IOPAD(0x36D8, PIN_INPUT | MUX_MODE15) /* A11: P9.29a: mcasp1_axr9.off */ //mcasp0_fsx off MODE15
+
+/* BELA3 */ DRA7XX_CORE_IOPAD(0x36A8, PIN_INPUT_PULLDOWN | MUX_MODE0) /* D14: P9.29b: mcasp1_fsx.off */ //mcasp0_fsx mcasp1_fsx MODE0
+/* BELA4 */ DRA7XX_CORE_IOPAD(0x36DC, PIN_INPUT_PULLDOWN | MUX_MODE0) /* B13: P9.30: mcasp1_axr10.off */ //mcasp0_axr0 mcasp1_axr10 MODE0
+/* BELA5 */ DRA7XX_CORE_IOPAD(0x36D4, PIN_INPUT | MUX_MODE15) /* B12: P9.31a: mcasp1_axr8.off */ // mcasp0_aclkx off MODE15
+/* BELA6 */ DRA7XX_CORE_IOPAD(0x36A4, PIN_INPUT_PULLDOWN | MUX_MODE0) /* C14: P9.31b: mcasp1_aclkx.off */ // mcasp0_aclkx mcasp1_aclkx MODE0
+		>;
+	};
+};
+
+#if 0 // already defined below, this conflicts
+&mcasp1	{
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcasp1_pins>;
+	status = "okay";
+	op-mode = <0>;	/* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	serial-dir = <	/* 0: INACTIVE, 1: TX, 2: RX */
+			0 0 1 0
+		>;
+	tx-num-evt = <32>;
+	rx-num-evt = <32>;
+};
+#endif
+
+&i2c4 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	status = "okay";
+	pinctrl-names = "default";
+// fake pins, because we do not have a pin group for i2c2/3 yet
+	//pinctrl-0 = <&mcasp1_pins>;
+	//pinctrl-0 =  {
+		//pinctrl-single,pins = <>};
+
+	tlv320aic3104: tlv320aic3104@18 {
+		#sound-dai-cells = <0>;
+		compatible = "ti,tlv320aic3104";
+		reg = <0x18>;
+	};
+};
+
+/ {
+	clk_mcasp1_fixed: clk_mcasp1_fixed {
+		#clock-cells = <0>;
+		compatible = "fixed-clock";
+		clock-frequency = <24576000>;
+		
+	};
+
+	clk_mcasp1: clk_mcasp1 {
+		#clock-cells = <0>;
+		compatible = "gpio-gate-clock";
+		clocks = <&clk_mcasp1_fixed>;
+		enable-gpios = <&gpio7 31 0>; /* BBAI Clk enable on GPIO7_31. No idea what this meant on BB-AUDIO-02 */
+	};
+
+// the two below are from BB-BONE-AUDI-02-00A0.dts
+	sound {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "AudioCape Rev B";
+		simple-audio-card,widgets =
+			"Headphone", "Headphone Jack",
+			"Line", "Line In";
+		simple-audio-card,routing =
+			"Headphone Jack",       "HPLOUT",
+			"Headphone Jack",       "HPROUT",
+			"LINE1L",               "Line In",
+			"LINE1R",               "Line In";
+		simple-audio-card,format = "dsp_b";
+		simple-audio-card,bitclock-master = <&sound_master>;
+		simple-audio-card,frame-master = <&sound_master>;
+		simple-audio-card,bitclock-inversion;
+
+		simple-audio-card,cpu {
+			sound-dai = <&mcasp1>;
+		};
+
+		sound_master: simple-audio-card,codec {
+			#sound-dai-cells = <0>;
+			sound-dai = <&tlv320aic3104>;
+			clocks = <&clk_mcasp1>;
+			clock-names = "mclk";
+		};
+	};
+};
+&mcasp1 {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&mcasp1_pins>; // bone_audio_cape_audio_pins
+	status = "okay";
+	op-mode = <0>;          /* MCASP_IIS_MODE */
+	tdm-slots = <2>;
+	num-serializer = <16>;
+	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
+		2 0 1 0
+		0 0 0 0
+		0 0 0 0
+		0 0 0 0
+	>;
+	tx-num-evt = <1>;
+	rx-num-evt = <1>;
+};
+#endif /* BELA */

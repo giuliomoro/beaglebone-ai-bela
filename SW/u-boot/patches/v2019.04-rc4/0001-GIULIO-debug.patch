@@ -1,0 +1,56 @@
+From a5d9f687d1a6e7e274fa4dff0dca86e6911bce09 Mon Sep 17 00:00:00 2001
+From: Jason Kridner <jdk@ti.com>
+Date: Thu, 16 May 2019 13:26:35 +0000
+Subject: [PATCH] GIULIO debug
+
+---
+ board/ti/am57xx/board.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/board/ti/am57xx/board.c b/board/ti/am57xx/board.c
+index 74fe7d79e5..4929296f15 100644
+--- a/board/ti/am57xx/board.c
++++ b/board/ti/am57xx/board.c
+@@ -817,6 +817,7 @@ void set_muxconf_regs(void)
+ #ifdef CONFIG_IODELAY_RECALIBRATION
+ void recalibrate_iodelay(void)
+ {
++	puts("GIULIO: recalibrate_iodelay\n");
+ 	const struct pad_conf_entry *pconf;
+ 	const struct iodelay_cfg_entry *iod, *delta_iod;
+ 	int pconf_sz, iod_sz, delta_iod_sz = 0;
+@@ -839,6 +840,7 @@ void recalibrate_iodelay(void)
+ 		iod_sz = ARRAY_SIZE(iodelay_cfg_array_am571x_idk);
+ 	} else if (board_is_bbai()) {
+ 		/* Common for X15/GPEVM */
++		puts("GIULIO: core_padconf_array_essential_bbai\n");
+ 		pconf = core_padconf_array_essential_bbai;
+ 		pconf_sz = ARRAY_SIZE(core_padconf_array_essential_bbai);
+ 		/* Since full production should switch to SR2.0  */
+@@ -869,6 +871,7 @@ void recalibrate_iodelay(void)
+ 
+ 	/* Now do the weird minor deltas that should be safe */
+ 	if (board_is_x15() || board_is_am572x_evm()) {
++		puts("GIULIO: board_is_x15() || board_is_am572x_evm()\n");
+ 		if (board_is_x15_revb1() || board_is_am572x_evm_reva3() ||
+ 		    board_is_x15_revc()) {
+ 			pconf = core_padconf_array_delta_x15_sr2_0;
+@@ -881,6 +884,7 @@ void recalibrate_iodelay(void)
+ 	}
+ 
+ 	if (board_is_am571x_idk()) {
++		puts("GIULIO: board_is_am571x_idk\n");
+ 		if (am571x_idk_needs_lcd()) {
+ 			pconf = core_padconf_array_vout_am571x_idk;
+ 			pconf_sz = ARRAY_SIZE(core_padconf_array_vout_am571x_idk);
+@@ -978,6 +982,7 @@ int spl_start_uboot(void)
+ 		struct udevice *dev;
+ 		int rc;
+ 
++		puts("GIULIO: spl_start_uboot\n");
+ 		printf("CTRL_CORE_PAD_I2C1_SDA:    0x%08x\n", readl(0x4A003800));
+ 		printf("CTRL_CORE_PAD_I2C1_SCL:    0x%08x\n", readl(0x4A003804));
+ 		printf("CTRL_CORE_PAD_GPMC_A0:     0x%08x\n", readl(0x4A003440));
+-- 
+2.11.0
+

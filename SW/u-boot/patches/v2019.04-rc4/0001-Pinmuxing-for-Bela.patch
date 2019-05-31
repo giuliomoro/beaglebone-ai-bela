@@ -1,0 +1,68 @@
+From 8f91d5cb01682f3727b5529bd81cc1f66440e75b Mon Sep 17 00:00:00 2001
+From: Jason Kridner <jdk@ti.com>
+Date: Thu, 16 May 2019 19:41:37 +0000
+Subject: [PATCH] Pinmuxing for Bela
+
+---
+ board/ti/am57xx/mux_data.h | 28 +++++++++++++++++++++-------
+ 1 file changed, 21 insertions(+), 7 deletions(-)
+
+diff --git a/board/ti/am57xx/mux_data.h b/board/ti/am57xx/mux_data.h
+index 33edf7972b..371d4dac8e 100644
+--- a/board/ti/am57xx/mux_data.h
++++ b/board/ti/am57xx/mux_data.h
+@@ -10,6 +10,13 @@
+ #define _MUX_DATA_BEAGLE_X15_H_
+ 
+ #include <asm/arch/mux_dra7xx.h>
++#define BELA0 {0x294, PIN_OUTPUT_PULLDOWN | M3}
++#define BELA1 {0x2E0, PIN_INPUT_PULLDOWN | M0}
++#define BELA2 {0x2D8, PIN_INPUT | M15}
++#define BELA3 {0x2A8, PIN_INPUT_PULLDOWN | M0}
++#define BELA4 {0x2DC, PIN_INPUT_PULLDOWN | M0}
++#define BELA5 {0x2D4, PIN_INPUT | M15}
++#define BELA6 {0x2A4, PIN_INPUT_PULLDOWN | M0}
+ 
+ const struct pad_conf_entry core_padconf_array_essential_x15[] = {
+ 	{GPMC_AD0, (M2 | PIN_INPUT | MANUAL_MODE)},	/* gpmc_ad0.vin3a_d0 */
+@@ -400,12 +407,15 @@ const struct pad_conf_entry core_padconf_array_essential_bbai[] = {
+ 	{GPIO6_14, (M10 | PIN_INPUT_PULLUP)},	/* gpio6_14.timer1 */
+ 	{GPIO6_15, (M10 | PIN_INPUT_PULLUP)},	/* gpio6_15.timer2 */
+ 	{GPIO6_16, (M10 | PIN_INPUT_PULLUP)},	/* gpio6_16.timer3 */
+-	{XREF_CLK0, (M9 | PIN_OUTPUT_PULLDOWN)},	/* xref_clk0.clkout2 */
++	BELA0,
++	//{XREF_CLK0, (M9 | PIN_OUTPUT_PULLDOWN)},	/* xref_clk0.clkout2 */
+ 	{XREF_CLK1, (M14 | PIN_INPUT_PULLDOWN)},	/* xref_clk1.gpio6_18 */
+ 	{XREF_CLK2, (M14 | PIN_INPUT_PULLDOWN)},	/* xref_clk2.gpio6_19 */
+ 	{XREF_CLK3, (M9 | PIN_OUTPUT_PULLDOWN)},	/* xref_clk3.clkout3 */
+-	{MCASP1_ACLKX, (M10 | PIN_INPUT_PULLUP)},	/* mcasp1_aclkx.i2c3_sda */
+-	{MCASP1_FSX, (M10 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* mcasp1_fsx.i2c3_scl */
++	//{MCASP1_ACLKX, (M10 | PIN_INPUT_PULLUP)},	/* mcasp1_aclkx.i2c3_sda */
++	BELA6,
++	//{MCASP1_FSX, (M10 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* mcasp1_fsx.i2c3_scl */
++	BELA3,
+ 	{MCASP1_ACLKR, (M10 | PIN_INPUT_PULLUP)},	/* mcasp1_aclkr.i2c4_sda */
+ 	{MCASP1_FSR, (M10 | PIN_INPUT_PULLUP)},	/* mcasp1_fsr.i2c4_scl */
+ 	{MCASP1_AXR0, (M10 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* mcasp1_axr0.i2c5_sda */
+@@ -416,10 +426,14 @@ const struct pad_conf_entry core_padconf_array_essential_bbai[] = {
+ 	{MCASP1_AXR5, (M14 | PIN_INPUT_PULLDOWN)},	/* mcasp1_axr5.gpio5_7 */
+ 	{MCASP1_AXR6, (M14 | PIN_INPUT_PULLDOWN)},	/* mcasp1_axr6.gpio5_8 */
+ 	{MCASP1_AXR7, (M14 | PIN_INPUT_PULLDOWN)},	/* mcasp1_axr7.gpio5_9 */
+-	{MCASP1_AXR8, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr8.gpio5_10 */
+-	{MCASP1_AXR9, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr9.gpio5_11 */
+-	{MCASP1_AXR10, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr10.gpio5_12 */
+-	{MCASP1_AXR11, (M14 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* mcasp1_axr11.gpio4_17 */
++	//{MCASP1_AXR8, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr8.gpio5_10 */
++	BELA5,
++	//{MCASP1_AXR9, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr9.gpio5_11 */
++	BELA2,
++	//{MCASP1_AXR10, (M14 | PIN_INPUT | SLEWCONTROL)},	/* mcasp1_axr10.gpio5_12 */
++	BELA4,
++	//{MCASP1_AXR11, (M14 | PIN_INPUT_PULLUP | SLEWCONTROL)},	/* mcasp1_axr11.gpio4_17 */
++	BELA1,
+ 	{MCASP1_AXR12, (M1 | PIN_INPUT_SLEW | VIRTUAL_MODE10)},	/* mcasp1_axr12.mcasp7_axr0 */
+ 	{MCASP1_AXR13, (M1 | PIN_INPUT_SLEW | VIRTUAL_MODE10)},	/* mcasp1_axr13.mcasp7_axr1 */
+ 	{MCASP1_AXR14, (M1 | PIN_INPUT_SLEW | VIRTUAL_MODE10)},	/* mcasp1_axr14.mcasp7_aclkx */
+-- 
+2.11.0
+
