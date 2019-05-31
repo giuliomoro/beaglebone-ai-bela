@@ -14,7 +14,7 @@
 #include <dt-bindings/pinctrl/dra.h>
 
 #define MAX_SOURCES 400
-#define KERNEL_4_9
+//#define KERNEL_4_9
 #define BELA
 
 / {
@@ -7345,33 +7345,12 @@
 	};
 };
 
-#if 0 // already defined below, this conflicts
-&mcasp1	{
-	#sound-dai-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&mcasp1_pins>;
-	status = "okay";
-	op-mode = <0>;	/* MCASP_IIS_MODE */
-	tdm-slots = <2>;
-	serial-dir = <	/* 0: INACTIVE, 1: TX, 2: RX */
-			0 0 1 0
-		>;
-	tx-num-evt = <32>;
-	rx-num-evt = <32>;
-};
-#endif
-
 &i2c4 {
 	#address-cells = <1>;
 	#size-cells = <0>;
 	clock-frequency = <100000>;
 	status = "okay";
 	pinctrl-names = "default";
-// fake pins, because we do not have a pin group for i2c2/3 yet
-	//pinctrl-0 = <&mcasp1_pins>;
-	//pinctrl-0 =  {
-		//pinctrl-single,pins = <>};
-
 	tlv320aic3104: tlv320aic3104@18 {
 		#sound-dai-cells = <0>;
 		compatible = "ti,tlv320aic3104";
@@ -7380,19 +7359,6 @@
 };
 
 / {
-	clk_mcasp1_fixed: clk_mcasp1_fixed {
-		#clock-cells = <0>;
-		compatible = "fixed-clock";
-		clock-frequency = <24576000>;
-		
-	};
-
-	clk_mcasp1: clk_mcasp1 {
-		#clock-cells = <0>;
-		compatible = "gpio-gate-clock";
-		clocks = <&clk_mcasp1_fixed>;
-		enable-gpios = <&gpio7 31 0>; /* BBAI Clk enable on GPIO7_31. No idea what this meant on BB-AUDIO-02 */
-	};
 
 // the two below are from BB-BONE-AUDI-02-00A0.dts
 	sound {
@@ -7413,12 +7379,16 @@
 
 		simple-audio-card,cpu {
 			sound-dai = <&mcasp1>;
+			compatible = "fixed-clock";
+			system-clock-frequency = <20000000>;
+			system-clock-direction-out = <1>;
 		};
 
 		sound_master: simple-audio-card,codec {
 			#sound-dai-cells = <0>;
 			sound-dai = <&tlv320aic3104>;
-			clocks = <&clk_mcasp1>;
+			clocks = <&mcasp1_ahclkx_mux>;
+			clock-frequency = <20000000>;
 			clock-names = "mclk";
 		};
 	};
@@ -7426,18 +7396,20 @@
 &mcasp1 {
 	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
-	pinctrl-0 = <&mcasp1_pins>; // bone_audio_cape_audio_pins
+	pinctrl-0 = <&mcasp1_pins>;
 	status = "okay";
 	op-mode = <0>;          /* MCASP_IIS_MODE */
 	tdm-slots = <2>;
 	num-serializer = <16>;
 	serial-dir = <  /* 0: INACTIVE, 1: TX, 2: RX */
-		2 0 1 0
 		0 0 0 0
 		0 0 0 0
+		0 0 2 1
 		0 0 0 0
 	>;
 	tx-num-evt = <1>;
 	rx-num-evt = <1>;
+	assigned-clocks = <&mcasp1_ahclkx_mux>;
+	assigned-clock-parents = <&func_24m_clk>; // <&sys_clkin2>;
 };
-#endif /* BELA */
+#endif /* BELA */ 
